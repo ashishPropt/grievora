@@ -102,20 +102,22 @@ export async function summarizeGrievance(rawText: string): Promise<{
   category: string;
   severity_suggestion: number;
 }> {
-  const response = await client.messages.create({
-    model: config.anthropic.model,
-    max_tokens: 512,
-    system: `Summarize a user grievance into a short neutral description (2-3 sentences). Also classify it and suggest a severity. Return JSON only:
-{"summary":"...","category":"BILLING|MISCONDUCT|DELAY|COMMUNICATION|OTHER","severity_suggestion":1-5}`,
-    messages: [{ role: 'user', content: rawText }],
-  });
-
-  const text = response.content[0].type === 'text' ? response.content[0].text : '{}';
+  const fallback = { summary: rawText.slice(0, 300), category: 'OTHER', severity_suggestion: 3 };
   try {
+    const response = await client.messages.create({
+      model: config.anthropic.model,
+      max_tokens: 512,
+      system: `Summarize a user grievance into a short neutral description (2-3 sentences). Also classify it and suggest a severity. Return JSON only:
+{"summary":"...","category":"BILLING|MISCONDUCT|DELAY|COMMUNICATION|OTHER","severity_suggestion":1-5}`,
+      messages: [{ role: 'user', content: rawText }],
+    });
+
+    const text = response.content[0].type === 'text' ? response.content[0].text : '{}';
     const m = text.match(/\{[\s\S]*\}/);
-    return m ? JSON.parse(m[0]) : { summary: rawText.slice(0, 200), category: 'OTHER', severity_suggestion: 3 };
-  } catch {
-    return { summary: rawText.slice(0, 200), category: 'OTHER', severity_suggestion: 3 };
+    return m ? JSON.parse(m[0]) : fallback;
+  } catch (err) {
+    logger.warn('summarizeGrievance LLM call failed, using fallback', { error: String(err) });
+    return fallback;
   }
 }
 
