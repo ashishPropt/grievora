@@ -13,6 +13,25 @@ import { computeProviderScore } from '../services/scoring';
 import { uploadFile } from '../services/storage';
 import logger from '../utils/logger';
 
+/** Convert any date-ish string to YYYY-MM-DD, or return null if unparseable. */
+function parseDateSafe(raw?: string): string | null {
+  if (!raw) return null;
+  // Already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw.trim())) return raw.trim();
+  // Try JS Date parsing (handles "January 2026", "March 15 2024", "2024-03", etc.)
+  const d = new Date(raw);
+  if (!isNaN(d.getTime())) {
+    return d.toISOString().split('T')[0];
+  }
+  // Month + Year like "January 2026"
+  const m = raw.match(/(\w+)\s+(\d{4})/);
+  if (m) {
+    const d2 = new Date(`${m[1]} 1, ${m[2]}`);
+    if (!isNaN(d2.getTime())) return d2.toISOString().split('T')[0];
+  }
+  return null; // store null rather than crash
+}
+
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
@@ -101,7 +120,7 @@ router.post('/session/:session_id/complete', optionalAuth, grievanceLimiter, asy
         summary.summary,
         summary.category,
         state.severity || summary.severity_suggestion || 3,
-        state.incident_date || null,
+        parseDateSafe(state.incident_date),
         state.is_anonymous !== false,
         moderation.risk_score,
         JSON.stringify(moderation.flags),
