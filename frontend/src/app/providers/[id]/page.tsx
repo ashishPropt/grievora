@@ -35,7 +35,7 @@ export default function ProviderDetailPage() {
             <div className="flex items-center gap-2 mb-1">
               <h1 className="text-2xl font-bold text-slate-900">{provider.name}</h1>
               {provider.status === 'VERIFIED' && (
-                <CheckCircle className="w-5 h-5 text-green-500" title="Verified" />
+                <CheckCircle className="w-5 h-5 text-green-500" aria-label="Verified" />
               )}
             </div>
             <div className="flex items-center gap-4 text-sm text-slate-500 mt-2 flex-wrap">

@@ -17,7 +17,7 @@ export default function ProviderCard({ provider }: { provider: Provider }) {
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-slate-900 truncate">{provider.name}</h3>
             {provider.status === 'VERIFIED' && (
-              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" title="Verified provider" />
+              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" aria-label="Verified provider" />
             )}
           </div>
           <div className="flex items-center gap-1 text-sm text-slate-500 mt-1">

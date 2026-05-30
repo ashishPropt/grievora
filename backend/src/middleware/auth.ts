@@ -53,5 +53,5 @@ export const requireRole = (...roles: UserRole[]) => {
 };
 
 export const signToken = (userId: string, role: UserRole): string => {
-  return jwt.sign({ userId, role }, config.jwt.secret, { expiresIn: config.jwt.expiresIn });
+  return jwt.sign({ userId, role }, config.jwt.secret, { expiresIn: config.jwt.expiresIn as jwt.SignOptions['expiresIn'] });
 };
