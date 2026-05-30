@@ -24,7 +24,7 @@ export default function ProviderDetailPage() {
   if (pLoading) return <div className="text-center py-20 text-slate-400">Loading...</div>;
   if (!provider) return <div className="text-center py-20 text-slate-400">Provider not found.</div>;
 
-  const score = provider.score || 0;
+  const score = Number(provider.score) || 0;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">

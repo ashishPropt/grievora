@@ -9,7 +9,7 @@ const SCORE_COLOR = (score: number) => {
 };
 
 export default function ProviderCard({ provider }: { provider: Provider }) {
-  const score = provider.score || 0;
+  const score = Number(provider.score) || 0;
   return (
     <Link href={`/providers/${provider.id}`} className="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start gap-3">
